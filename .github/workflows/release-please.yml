@@ -1,0 +1,26 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          # A pull request opened with the default GITHUB_TOKEN does not trigger
+          # other workflows, so the required `ci` check would never report and the
+          # release pull request could never be merged. Set a RELEASE_PLEASE_TOKEN
+          # secret to lift that; without it the fallback still opens the pull
+          # request, it just has to be merged using the ruleset bypass.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
