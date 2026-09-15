@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+#
+# Refuses a commit that stages an environment file, leaks a secret, or is not
+# formatted.
+#
+# This repository is public. A secret pushed here is indexed within minutes and
+# has to be revoked, not merely rewritten out of the history.
+#
+# Bypass with `git commit --no-verify`, and say so in the pull request.
+
+RED=$(printf '\033[0;31m')
+RESET=$(printf '\033[0m')
+
+fail() {
+    printf '%spre-commit: %s%s\n' "$RED" "$1" "$RESET" >&2
+    exit 1
+}
+
+staged() {
+    git diff --cached --name-only --diff-filter=ACMR
+}
+
+# 1. An environment file must never be committed. `.env.example` is the only
+#    file allowed to describe variables, and it carries no values.
+env_staged=$(staged | grep -E '(^|/)\.env' | grep -vE '\.env\.example$')
+if [ -n "$env_staged" ]; then
+    fail "an environment file is staged:
+
+$env_staged
+
+Unstage it with: git restore --staged <file>"
+fi
+
+# 2. Scan added lines for well-known secret shapes.
+#    `.githooks/` is excluded so this file never matches its own patterns.
+SECRET_PATTERNS='(AKIA|ASIA)[0-9A-Z]{16}'
+SECRET_PATTERNS="$SECRET_PATTERNS"'|-----BEGIN [A-Z ]*PRIVATE KEY-----'
+SECRET_PATTERNS="$SECRET_PATTERNS"'|gh[pousr]_[A-Za-z0-9]{36,}'
+SECRET_PATTERNS="$SECRET_PATTERNS"'|xox[baprs]-[0-9A-Za-z-]{10,}'
+SECRET_PATTERNS="$SECRET_PATTERNS"'|sk_live_[0-9A-Za-z]{16,}'
+SECRET_PATTERNS="$SECRET_PATTERNS"'|APP_KEY=base64:[A-Za-z0-9+/=]{20,}'
+
+hits=""
+while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    found=$(git diff --cached -U0 -- "$file" \
+        | grep '^+' \
+        | grep -E "$SECRET_PATTERNS")
+    [ -n "$found" ] && hits="$hits$file: $found"$'\n'
+done < <(staged | grep -vE '^\.githooks/')
+
+if [ -n "$hits" ]; then
+    fail "a staged line looks like a secret:
+
+$hits
+If this is a false positive, bypass with --no-verify and flag it in the pull request."
+fi
+
+# 3. PHP formatting. Checked, never fixed silently: a hook must not change what
+#    you are about to commit behind your back.
+php_files=()
+while IFS= read -r file; do
+    [ -n "$file" ] && php_files+=("$file")
+done < <(staged | grep -E '\.php$')
+
+if [ ${#php_files[@]} -gt 0 ]; then
+    if ! vendor/bin/pint --test "${php_files[@]}" >/dev/null 2>&1; then
+        printf '%spre-commit: PHP formatting issues in staged files.%s\n\n' "$RED" "$RESET" >&2
+        vendor/bin/pint --test "${php_files[@]}" >&2
+        printf '\nFix and re-stage with: vendor/bin/pint && git add -u\n' >&2
+        exit 1
+    fi
+fi
+
+exit 0
