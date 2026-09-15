@@ -1,11 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "mikahza/alyawma",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Daily nutrition tracker: log what you eat in three taps and see what is left to hit your protein, calorie and fibre targets.",
     "keywords": [
         "laravel",
-        "framework"
+        "inertia",
+        "nutrition",
+        "vue"
     ],
     "license": "MIT",
     "require": {
