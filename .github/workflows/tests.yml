@@ -31,8 +31,23 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Setup Application
-        run: composer setup
+      # `composer setup` is the local bootstrap: it also runs `migrate`, which
+      # needs the MySQL server a developer has and a runner does not. The suite
+      # runs on SQLite in memory and migrates itself, so CI never needs a
+      # database.
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Run CI Checks
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Prepare the environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Run CI checks
         run: composer ci:check
