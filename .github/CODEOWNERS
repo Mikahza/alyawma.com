@@ -1,0 +1,9 @@
+# Ownership for every path in this repository.
+# See https://docs.github.com/articles/about-code-owners
+#
+# This has no enforcement effect while the repository has a single maintainer:
+# GitHub does not request a review from the author of a pull request. It is here
+# so that ownership is explicit, and so that review routing already works the day
+# a second contributor arrives.
+
+* @Mikahza
