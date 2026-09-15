@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#
+# Enforces Conventional Commits.
+#
+# release-please derives the changelog and the next version from these messages.
+# A malformed type is a missing changelog entry, or a release that never fires.
+#
+# Bypass with `git commit --no-verify`.
+
+RED=$(printf '\033[0;31m')
+YELLOW=$(printf '\033[0;33m')
+RESET=$(printf '\033[0m')
+
+header=$(head -n 1 "$1")
+
+# Messages git writes on its own, and the rebase helpers, are left alone.
+case "$header" in
+    "Merge "*|"Revert "*|"fixup!"*|"squash!"*|"amend!"*) exit 0 ;;
+esac
+
+PATTERN='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._/-]+\))?!?: .+$'
+
+if ! printf '%s' "$header" | grep -qE "$PATTERN"; then
+    printf '%scommit-msg: the message does not follow Conventional Commits.%s\n\n' "$RED" "$RESET" >&2
+    printf '  got:      %s\n\n' "$header" >&2
+    printf '  expected: <type>[(scope)][!]: <description>\n\n' >&2
+    printf '  types:    build chore ci docs feat fix perf refactor revert style test\n' >&2
+    printf '  examples: feat: add administrator role\n' >&2
+    printf '            fix(tests): enable RefreshDatabase\n' >&2
+    printf '            refactor!: drop passkey support\n\n' >&2
+    printf '  Only feat, fix and a "!" breaking marker reach the changelog.\n' >&2
+    exit 1
+fi
+
+if [ ${#header} -gt 72 ]; then
+    printf '%scommit-msg: subject is %s characters, over the 72 that stay readable in git log.%s\n' \
+        "$YELLOW" "${#header}" "$RESET" >&2
+fi
+
+exit 0
