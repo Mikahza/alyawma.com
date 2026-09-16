@@ -405,6 +405,29 @@ Resolves C2 without understating the workload.
 
 Explicit project constraint.
 
+### D12 — While the version is 0.x, migrations are edited in place
+
+No data is worth preserving yet. A schema mistake is fixed by **editing the migration that introduced
+it** and running `php artisan migrate:fresh`, not by stacking a corrective migration on top. A clean
+set of migrations is worth more than a faithful record of our hesitations, and the lots ahead will
+reshape the model as it is built.
+
+Two boundaries make this safe, and the second one bites silently:
+
+- `migrate:fresh` is a **local** command. Never run it against production.
+- Production runs `migrate --force` on every deploy. A migration that has **already run there** is
+  recorded in the `migrations` table and will never run again — so editing it leaves production on
+  the old schema, with nothing to warn you. **Before editing a migration, check whether it has
+  already been deployed.**
+
+When it has already been deployed, the choice becomes explicit: add a corrective migration, or run
+`migrate:fresh` in production and accept losing what is in it. The second is only defensible while
+the maintainer is the sole user.
+
+This decision expires at 1.0.0, or the day a third party holds data in production — whichever comes
+first. It does not soften the additive-migration constraint that the zero-downtime deploy imposes on
+anything already live.
+
 ## 6. Repository baseline
 
 Surveyed 15 September 2026 at commit `baacd6d`. **No stack element is up for change** — this is a
