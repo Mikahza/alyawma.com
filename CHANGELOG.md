@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Mikahza/alyawma.com/compare/v0.2.0...v0.3.0) (2026-09-17)
+
+
+### Features
+
+* add the personal food library ([#14](https://github.com/Mikahza/alyawma.com/issues/14)) ([8f68109](https://github.com/Mikahza/alyawma.com/commit/8f68109781e4f33fd4f0e5c6271755ddee912ab7))
+
 ## [0.2.0](https://github.com/Mikahza/alyawma.com/compare/v0.1.0...v0.2.0) (2026-09-17)
 
 
