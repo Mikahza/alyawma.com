@@ -356,15 +356,26 @@ Changing a target creates a new version effective from a date; it does not overw
 one. Answering "was the target met on 12 March?" means resolving the goal version applicable on
 12 March. **Open — see Q3.**
 
-### D3 — Macros are stored **per reference serving**, not per 100 g
+### D3 — Macros are stored against a **typed reference quantity and unit**
 
-The spec mandates a decimal multiplier (`1.5 servings`) as the only quantity lever, and free-form
-meals whose values are hand-entered. A meal like `My usual breakfast` has no meaningful "per 100 g"
-value. Each food therefore carries its values **for one serving**, plus a free-form serving label
-(`1 bowl`, `100 g`, `1 slice`) used for display only. No arithmetic is ever done on that label.
+**Revised on 17 September 2026.** The original decision stored values "per serving" with a free-form
+label (`1 bowl`, `100 g`). That label computed nothing, so eating 137 g of a food described per 100 g
+meant entering **1.37 servings** — a division done in the head, standing in a kitchen, by an
+application whose whole promise is to remove exactly that.
 
-*Accepted consequence:* you cannot say "I ate 137 g of chicken". You say "1.37 servings". For a food
-whose reference serving is 100 g, that is equivalent.
+Each food now carries `reference_quantity` and `reference_unit`, the unit being one of **`g`, `ml`,
+`piece`** (`App\Enums\FoodUnit`). The values are "for 100 g", "for 1 piece". When logging, the
+amount eaten is entered in that same unit and the application divides.
+
+This covers the two natures of food the old model collapsed into one:
+
+| | Example | Was | Is |
+|---|---|---|---|
+| Weighed or measured | Chicken, rice, yoghurt | "1.37 servings" | "137 g" |
+| Countable | `My usual breakfast`, an apple | "1.5 servings" | "1.5 pieces" |
+
+*Accepted consequence:* a food cannot be described in a unit outside the three. `1 bowl` is expressed
+as one `piece`, the bowl being named by the food itself.
 
 ### D4 — No floating point for nutrients
 
@@ -406,7 +417,32 @@ Resolves C2 without understating the workload.
 
 Explicit project constraint.
 
-### D12 — While the version is 0.x, migrations are edited in place
+### D12 — Tapping a food means eating it, not editing it
+
+Until lot 4 the catalogue is only a catalogue, so a tap opens the edit form. From lot 4 that is
+wrong: this list exists to be **consumed from**, several times a day, and editing a food is rare by
+comparison. The primary tap must log the food; editing becomes a secondary action.
+
+Recorded now rather than at lot 4, so the habit is not built and then broken.
+
+### D13 — The shared catalogue carries one row per language
+
+Personal foods never need translating: the account holder typed the name, in whatever language they
+think in, and nobody else ever sees it.
+
+The shared catalogue is published by an administrator, so it exists in the language it was published
+in. When the application serves more than one language, a shared food carries a `locale` and a user
+sees the rows matching theirs.
+
+Chosen over a `food_translations` table (a join on **every keystroke** of the search) and over a JSON
+column (which indexes poorly). Duplicated rows per language cost storage; the alternatives cost
+latency on the one interaction that has to stay instant.
+
+Nothing is built for this yet. The column arrives with the publication columns at lot 6, or never, if
+the application stays in French. An external food source such as OpenFoodFacts already carries names
+per language — the day one is imported, its model is adopted rather than one invented in advance.
+
+### D14 — While the version is 0.x, migrations are edited in place
 
 No data is worth preserving yet. A schema mistake is fixed by **editing the migration that introduced
 it** and running `php artisan migrate:fresh`, not by stacking a corrective migration on top. A clean
@@ -636,6 +672,33 @@ own right, alongside the application. A PR that mixes tooling with a feature des
 - Every PR must be demonstrable: a screenshot, a URL, or a passing test.
 - Tooling lands **before** the feature it governs.
 - Commit messages follow Conventional Commits — `release-please` depends on it.
+
+## Required fields carry a red asterisk
+
+Every required field in every form is labelled with `components/shared/Label.vue` and its
+`required` prop, which renders a `text-destructive` asterisk. Never write the star by hand, and
+never mark an optional field with a note saying so — the absence of a star is the signal.
+
+The asterisk is `aria-hidden`. The field's own `required` attribute is what assistive technology
+announces; a lone star repeated aloud is noise.
+
+## Controls all share one height
+
+Inputs, buttons, selects and anything else that sits on a form line are **always `h-9`**, which is
+the shadcn default for all three. Never reach for `size="lg"` or `size="sm"` on a control that can
+end up beside another one — a 40px button next to a 36px input is visible, and it is visible
+everywhere at once.
+
+A full-width button on a phone is still `h-9`. Width carries the emphasis, not height.
+
+## Where Vue components live
+
+- `components/ui/` — generated by shadcn-vue. Treat as vendor code: do not hand-edit, and it is
+  excluded from the formatter.
+- `components/shared/` — **components we customise and reuse across the whole application.** A
+  shadcn primitive wrapped to fit this project belongs here, not in `ui/`.
+- `components/` — everything else, including components tied to one domain.
+- `pages/` — Inertia page components, mirroring the route structure.
 
 ## Branching
 
