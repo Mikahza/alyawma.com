@@ -12,6 +12,7 @@ return [
     'current_password' => 'Le mot de passe est incorrect.',
     'decimal' => 'Ce champ doit comporter :decimal décimales.',
     'email' => 'Ce champ doit être une adresse e-mail valide.',
+    'enum' => 'La valeur sélectionnée est invalide.',
     'gt' => [
         'numeric' => 'Ce champ doit être supérieur à :value.',
     ],
