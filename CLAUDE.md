@@ -673,6 +673,33 @@ own right, alongside the application. A PR that mixes tooling with a feature des
 - Tooling lands **before** the feature it governs.
 - Commit messages follow Conventional Commits — `release-please` depends on it.
 
+## The interface is translated, the repository is not
+
+The application is served in **French and English**, French first. The repository itself stays in
+English — code, comments, documentation, commit messages. Only what a user reads is translated.
+
+**Where strings live.** Interface strings are in `resources/js/locales/{fr,en}/*.json`, split by
+domain, with **dotted keys** (`foods.create_title`). Never the English text as the key: "Save" appears
+in three places that may one day need to differ, and correcting a wording would silently break its
+translation. Server-produced strings — validation, flash messages — live in `lang/`.
+
+**How to translate.** Import `t` from `@/plugins/i18n`, never `useI18n()`. One pattern everywhere, and
+it is reactive: a component that calls it re-renders when the language changes.
+
+**Translate at render time, never into a stored value.** `t()` called at module scope — inside
+`defineOptions`, which the compiler hoists out of `setup()` — runs before the locale is known and
+bakes in the wrong language. Breadcrumbs therefore carry a `titleKey`, which `Breadcrumbs.vue`
+translates. A list of labels built with `t()` belongs in a `computed`, not a `const`, or it will not
+follow a language switch.
+
+**Adding a key means adding it to every locale.** `LocaleCatalogueParityTest` fails otherwise, and it
+also fails on an empty string. That guarantee is taken at build time rather than paid for by a
+runtime fallback.
+
+**Switching language reloads the page.** The choice is a cookie the server reads on the next request,
+mirroring how the theme works. A client-side catalogue swap would leave everything the server
+produced — validation errors, flash toasts — in the previous language.
+
 ## Required fields carry a red asterisk
 
 Every required field in every form is labelled with `components/shared/Label.vue` and its

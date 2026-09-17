@@ -1,0 +1,10 @@
+{
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm_password": "Confirmer le mot de passe",
+    "email_address": "Adresse e-mail",
+    "full_name": "Nom complet",
+    "name": "Nom",
+    "password": "Mot de passe"
+}

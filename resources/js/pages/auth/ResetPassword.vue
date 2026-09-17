@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import { t } from '@/plugins/i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import Label from '@/components/shared/Label.vue';
 import { Spinner } from '@/components/ui/spinner';
 import { update } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Reset password',
-        description: 'Please enter your new password below',
+        title: t('auth.reset_title'),
+        description: t('auth.reset_subtitle'),
     },
 });
 
@@ -26,7 +27,7 @@ const inputEmail = ref(props.email);
 </script>
 
 <template>
-    <Head title="Reset password" />
+    <Head :title="t('auth.reset_title')" />
 
     <Form
         v-bind="update.form()"
@@ -36,7 +37,9 @@ const inputEmail = ref(props.email);
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="email">Email</Label>
+                <Label for="email" required>{{
+                    t('common.email_address')
+                }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -50,27 +53,31 @@ const inputEmail = ref(props.email);
             </div>
 
             <div class="grid gap-2">
-                <Label for="password">Password</Label>
+                <Label for="password" required>{{
+                    t('common.password')
+                }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"
                     autocomplete="new-password"
                     class="mt-1 block w-full"
                     autofocus
-                    placeholder="Password"
+                    :placeholder="t('common.password')"
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation"> Confirm password </Label>
+                <Label for="password_confirmation" required>{{
+                    t('common.confirm_password')
+                }}</Label>
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
                     autocomplete="new-password"
                     class="mt-1 block w-full"
-                    placeholder="Confirm password"
+                    :placeholder="t('common.confirm_password')"
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password_confirmation" />
@@ -83,7 +90,7 @@ const inputEmail = ref(props.email);
                 data-test="reset-password-button"
             >
                 <Spinner v-if="processing" />
-                Reset password
+                {{ t('auth.reset_title') }}
             </Button>
         </div>
     </Form>

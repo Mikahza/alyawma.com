@@ -14,6 +14,10 @@ import {
  * component serialises native form fields, and a Reka dropdown is not one — it
  * is a button and a popover. Outside a form the hidden input simply sits there,
  * so this works anywhere a plain `<select>` would.
+ *
+ * Reka reads an option's label from the DOM once, when the item mounts, so a
+ * label that changes language in place would keep showing the old one. Keying
+ * on the label remounts the item and re-registers it.
  */
 type Option = {
     value: string;
@@ -41,7 +45,7 @@ const model = defineModel<string>({ required: true });
             <SelectContent>
                 <SelectItem
                     v-for="option in options"
-                    :key="option.value"
+                    :key="`${option.value}:${option.label}`"
                     :value="option.value"
                 >
                     {{ option.label }}

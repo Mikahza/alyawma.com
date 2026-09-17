@@ -1,0 +1,11 @@
+{
+    "Food added.": "Aliment ajouté.",
+    "Food deleted.": "Aliment supprimé.",
+    "Food updated.": "Aliment modifié.",
+    "Password updated.": "Mot de passe modifié.",
+    "Profile updated.": "Profil modifié.",
+    "The reference quantity must be greater than zero.": "La quantité de référence doit être supérieure à zéro.",
+    "This value can not be negative.": "Cette valeur ne peut pas être négative.",
+    "Use at most one decimal, for example 12.3.": "Utilisez au plus une décimale, par exemple 12,3.",
+    "You already have a food with this name.": "Vous avez déjà un aliment portant ce nom."
+}

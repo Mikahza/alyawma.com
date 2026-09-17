@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { t } from '@/plugins/i18n';
 import { usePasskeyRegister } from '@laravel/passkeys/vue';
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import Label from '@/components/shared/Label.vue';
 
 const emit = defineEmits<{
     success: [];
@@ -61,7 +62,7 @@ const handleCancel = () => {
 
 <template>
     <div v-if="!isSupported" class="text-muted-foreground text-sm">
-        Passkeys are not supported in this browser.
+        {{ t('auth.passkey_unsupported') }}
     </div>
 
     <Button v-else-if="!showForm" variant="outline" @click="showForm = true">
@@ -74,17 +75,19 @@ const handleCancel = () => {
         class="border-border bg-muted/50 space-y-4 rounded-lg border p-4"
     >
         <div class="grid gap-2">
-            <Label for="passkey-name">Passkey name</Label>
+            <Label for="passkey-name" required>{{
+                t('auth.passkey_name')
+            }}</Label>
             <Input
                 id="passkey-name"
                 type="text"
                 v-model="name"
-                placeholder="e.g., MacBook Pro, iPhone"
+                :placeholder="t('auth.passkey_name_placeholder')"
                 class="border-foreground/20 mt-1 block w-full"
                 autofocus
             />
             <p class="text-muted-foreground text-xs">
-                A name helps you identify this passkey later.
+                {{ t('auth.passkey_name_hint') }}
             </p>
         </div>
 
@@ -92,10 +95,14 @@ const handleCancel = () => {
 
         <div class="flex gap-2">
             <Button type="submit" :disabled="isLoading || !name.trim()">
-                {{ isLoading ? 'Registering...' : 'Register passkey' }}
+                {{
+                    isLoading
+                        ? t('auth.passkey_registering')
+                        : t('auth.passkey_register')
+                }}
             </Button>
             <Button type="button" variant="ghost" @click="handleCancel">
-                Cancel
+                {{ t('common.cancel') }}
             </Button>
         </div>
     </form>

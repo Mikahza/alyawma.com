@@ -14,6 +14,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { t } from '@/plugins/i18n';
 import { index } from '@/routes/foods';
 import type { Food } from '@/types';
 
@@ -23,7 +24,7 @@ const props = defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Foods', href: index() }],
+        breadcrumbs: [{ titleKey: 'nav.foods', href: index() }],
     },
 });
 </script>
@@ -34,8 +35,8 @@ defineOptions({
     <div class="max-w-2xl space-y-6 px-4 py-6">
         <Heading
             variant="small"
-            title="Edit this food"
-            description="Changing these values never rewrites what you have already logged"
+            :title="t('foods.edit_title')"
+            :description="t('foods.edit_subtitle')"
         />
 
         <Form
@@ -46,7 +47,7 @@ defineOptions({
             <FoodFields :food="props.food" :errors="errors" />
 
             <Button :disabled="processing" class="w-full sm:w-auto">
-                Save
+                {{ t('common.save') }}
             </Button>
         </Form>
 
@@ -55,24 +56,27 @@ defineOptions({
             <Dialog>
                 <DialogTrigger as-child>
                     <Button variant="destructive" class="w-full sm:w-auto">
-                        Delete this food
+                        {{ t('foods.delete') }}
                     </Button>
                 </DialogTrigger>
 
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle
-                            >Delete “{{ props.food.name }}”?</DialogTitle
-                        >
+                        <DialogTitle>{{
+                            t('foods.delete_confirm_title', {
+                                name: props.food.name,
+                            })
+                        }}</DialogTitle>
                         <DialogDescription>
-                            It disappears from your list and from search. What
-                            you have already logged with it is untouched.
+                            {{ t('foods.delete_confirm_body') }}
                         </DialogDescription>
                     </DialogHeader>
 
                     <DialogFooter class="gap-2">
                         <DialogClose as-child>
-                            <Button variant="secondary">Keep it</Button>
+                            <Button variant="secondary">{{
+                                t('foods.delete_keep')
+                            }}</Button>
                         </DialogClose>
 
                         <Form
@@ -83,7 +87,7 @@ defineOptions({
                                 variant="destructive"
                                 :disabled="processing"
                             >
-                                Delete
+                                {{ t('common.delete') }}
                             </Button>
                         </Form>
                     </DialogFooter>

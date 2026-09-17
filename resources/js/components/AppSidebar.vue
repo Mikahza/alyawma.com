@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { Apple, BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -14,35 +15,36 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { t } from '@/plugins/i18n';
 import { dashboard } from '@/routes';
 import { index as foods } from '@/routes/foods';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
     {
-        title: 'Dashboard',
+        title: t('nav.dashboard'),
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'Foods',
+        title: t('nav.foods'),
         href: foods(),
         icon: Apple,
     },
-];
+]);
 
-const footerNavItems: NavItem[] = [
+const footerNavItems = computed<NavItem[]>(() => [
     {
-        title: 'Repository',
+        title: t('nav.repository'),
         href: 'https://github.com/laravel/vue-starter-kit',
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
+        title: t('nav.documentation'),
         href: 'https://laravel.com/docs/starter-kits#vue',
         icon: BookOpen,
     },
-];
+]);
 </script>
 
 <template>
