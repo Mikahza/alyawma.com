@@ -6,6 +6,7 @@ import { ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { t } from '@/plugins/i18n';
 import { create, edit, index } from '@/routes/foods';
 import type { Food } from '@/types';
 
@@ -16,7 +17,7 @@ const props = defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Foods', href: index() }],
+        breadcrumbs: [{ titleKey: 'nav.foods', href: index() }],
     },
 });
 
@@ -43,14 +44,14 @@ watchDebounced(
 </script>
 
 <template>
-    <Head title="Foods" />
+    <Head :title="t('nav.foods')" />
 
     <div class="max-w-3xl px-4 py-6 max-sm:pb-24">
         <div class="flex items-start justify-between gap-4">
             <Heading
                 variant="small"
-                title="Your foods"
-                description="Every food you log comes from this list"
+                :title="t('foods.title')"
+                :description="t('foods.subtitle')"
             />
 
             <!-- On a wide screen the action belongs beside the title. On a phone
@@ -58,7 +59,7 @@ watchDebounced(
             <Button as-child class="max-sm:hidden">
                 <Link :href="create()">
                     <Plus class="size-4" />
-                    Add a food
+                    {{ t('foods.add') }}
                 </Link>
             </Button>
         </div>
@@ -68,8 +69,8 @@ watchDebounced(
             type="search"
             class="mt-4 block w-full"
             autocomplete="off"
-            placeholder="Search your foods…"
-            aria-label="Search your foods"
+            :placeholder="t('foods.search')"
+            :aria-label="t('foods.search_label')"
         />
 
         <p
@@ -78,8 +79,8 @@ watchDebounced(
         >
             {{
                 search
-                    ? `Nothing matches “${search}”.`
-                    : 'Nothing yet. Add the foods you eat often and logging them will take three taps.'
+                    ? t('foods.no_match', { terms: search })
+                    : t('foods.empty')
             }}
         </p>
 
@@ -93,10 +94,12 @@ watchDebounced(
                         <span class="block truncate font-medium">{{
                             food.name
                         }}</span>
-                        <span class="text-muted-foreground block text-sm"
-                            >per {{ food.reference_quantity }}
-                            {{ food.reference_unit }}</span
-                        >
+                        <span class="text-muted-foreground block text-sm">{{
+                            t('foods.per_reference', {
+                                quantity: food.reference_quantity,
+                                unit: t(`foods.unit_${food.reference_unit}`),
+                            })
+                        }}</span>
                     </span>
                     <span class="shrink-0 text-right text-sm">
                         <span class="block font-medium"
@@ -116,7 +119,7 @@ watchDebounced(
         class="bg-background/80 fixed inset-x-0 bottom-0 border-t p-4 backdrop-blur sm:hidden"
     >
         <Button as-child class="w-full">
-            <Link :href="create()">Add a food</Link>
+            <Link :href="create()">{{ t('foods.add') }}</Link>
         </Button>
     </div>
 </template>

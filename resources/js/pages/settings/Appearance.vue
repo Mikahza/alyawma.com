@@ -2,13 +2,15 @@
 import { Head } from '@inertiajs/vue3';
 import AppearanceTabs from '@/components/AppearanceTabs.vue';
 import Heading from '@/components/Heading.vue';
+import LocaleTabs from '@/components/shared/LocaleTabs.vue';
+import { t } from '@/plugins/i18n';
 import { edit } from '@/routes/appearance';
 
 defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Appearance settings',
+                titleKey: 'settings.appearance_title',
                 href: edit(),
             },
         ],
@@ -17,16 +19,23 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Appearance settings" />
+    <Head :title="t('settings.appearance_title')" />
 
-    <h1 class="sr-only">Appearance settings</h1>
+    <h1 class="sr-only">{{ t('settings.appearance_title') }}</h1>
 
     <div class="space-y-6">
         <Heading
             variant="small"
-            title="Appearance settings"
-            description="Update the appearance settings for your account"
+            :title="t('settings.appearance_title')"
+            :description="t('settings.appearance_subtitle')"
         />
         <AppearanceTabs />
+
+        <Heading
+            variant="small"
+            :title="t('settings.language')"
+            :description="t('settings.language_subtitle')"
+        />
+        <LocaleTabs />
     </div>
 </template>

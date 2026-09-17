@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '@/plugins/i18n';
 import { computed, ref, watch } from 'vue';
 import InputError from '@/components/InputError.vue';
 import Select from '@/components/shared/Select.vue';
@@ -11,11 +12,11 @@ const props = defineProps<{
     errors: Record<string, string>;
 }>();
 
-const units: { value: FoodUnit; label: string }[] = [
-    { value: 'g', label: 'grams' },
-    { value: 'ml', label: 'millilitres' },
-    { value: 'piece', label: 'piece(s)' },
-];
+const units = computed<{ value: FoodUnit; label: string }[]>(() => [
+    { value: 'g', label: t('foods.unit_g') },
+    { value: 'ml', label: t('foods.unit_ml') },
+    { value: 'piece', label: t('foods.unit_piece') },
+]);
 
 const unit = ref<string>(props.food?.reference_unit ?? 'g');
 const quantity = ref(props.food?.reference_quantity ?? '100');
@@ -87,22 +88,22 @@ const caloriesLookWrong = computed(() => {
 
 <template>
     <div class="grid gap-2">
-        <Label for="name" required>Name</Label>
+        <Label for="name" required>{{ t('common.name') }}</Label>
         <Input
             id="name"
             name="name"
             :default-value="food?.name"
             required
             autocomplete="off"
-            placeholder="Chicken breast, My usual breakfast…"
+            :placeholder="t('foods.name_placeholder')"
         />
         <InputError :message="errors.name" />
     </div>
 
     <div class="grid gap-2">
-        <Label for="reference_quantity" required
-            >The values below are for</Label
-        >
+        <Label for="reference_quantity" required>{{
+            t('foods.reference_label')
+        }}</Label>
         <div class="flex gap-2">
             <Input
                 id="reference_quantity"
@@ -121,8 +122,7 @@ const caloriesLookWrong = computed(() => {
             />
         </div>
         <p class="text-muted-foreground text-sm">
-            Enter the values as they appear on the label. When you log this food
-            you will type how much you ate, not a multiplier.
+            {{ t('foods.reference_help') }}
         </p>
         <InputError :message="errors.reference_quantity" />
         <InputError :message="errors.reference_unit" />
@@ -130,7 +130,7 @@ const caloriesLookWrong = computed(() => {
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="grid gap-2">
-            <Label for="protein_grams" required>Protein (g)</Label>
+            <Label for="protein_grams" required>{{ t('foods.protein') }}</Label>
             <Input
                 id="protein_grams"
                 v-model="protein"
@@ -143,7 +143,7 @@ const caloriesLookWrong = computed(() => {
         </div>
 
         <div class="grid gap-2">
-            <Label for="fibre_grams" required>Fibre (g)</Label>
+            <Label for="fibre_grams" required>{{ t('foods.fibre') }}</Label>
             <Input
                 id="fibre_grams"
                 v-model="fibre"
@@ -156,7 +156,7 @@ const caloriesLookWrong = computed(() => {
         </div>
 
         <div class="grid gap-2">
-            <Label for="fat_grams">Fat (g)</Label>
+            <Label for="fat_grams">{{ t('foods.fat') }}</Label>
             <Input
                 id="fat_grams"
                 v-model="fat"
@@ -168,7 +168,9 @@ const caloriesLookWrong = computed(() => {
         </div>
 
         <div class="grid gap-2">
-            <Label for="carbohydrate_grams">Carbs (g)</Label>
+            <Label for="carbohydrate_grams">{{
+                t('foods.carbohydrates')
+            }}</Label>
             <Input
                 id="carbohydrate_grams"
                 v-model="carbohydrate"
@@ -184,7 +186,7 @@ const caloriesLookWrong = computed(() => {
          three values that drive a gauge — the display order elsewhere stays
          protein, calories, fibre. -->
     <div class="grid gap-2 sm:max-w-xs">
-        <Label for="calories" required>Calories (kcal)</Label>
+        <Label for="calories" required>{{ t('foods.calories') }}</Label>
         <Input
             id="calories"
             v-model="calories"
@@ -199,15 +201,17 @@ const caloriesLookWrong = computed(() => {
             v-if="!caloriesAreOwned && suggestedCalories > 0"
             class="text-muted-foreground text-sm"
         >
-            Worked out from the macros above. Type over it if the label says
-            otherwise.
+            {{ t('foods.calories_suggested') }}
         </p>
         <p
             v-else-if="caloriesLookWrong"
             class="text-sm text-amber-600 dark:text-amber-500"
         >
-            The macros suggest about {{ suggestedCalories }} kcal. Worth a
-            second look.
+            {{
+                t('foods.calories_suspicious', {
+                    expected: suggestedCalories,
+                })
+            }}
         </p>
         <InputError :message="errors.calories" />
     </div>

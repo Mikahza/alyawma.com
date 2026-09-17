@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import { t } from '@/plugins/i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import Label from '@/components/shared/Label.vue';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Forgot password',
-        description: 'Enter your email to receive a password reset link',
+        title: t('auth.forgot_password_title'),
+        description: t('auth.forgot_subtitle'),
     },
 });
 
@@ -22,7 +23,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Forgot password" />
+    <Head :title="t('auth.forgot_password_title')" />
 
     <div
         v-if="status"
@@ -34,14 +35,16 @@ defineProps<{
     <div class="space-y-6">
         <Form v-bind="email.form()" v-slot="{ errors, processing }">
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email" required>{{
+                    t('common.email_address')
+                }}</Label>
                 <Input
                     id="email"
                     type="email"
                     name="email"
                     autocomplete="off"
                     autofocus
-                    placeholder="email@example.com"
+                    :placeholder="t('auth.email_placeholder')"
                 />
                 <InputError :message="errors.email" />
             </div>
@@ -53,14 +56,14 @@ defineProps<{
                     data-test="email-password-reset-link-button"
                 >
                     <Spinner v-if="processing" />
-                    Email password reset link
+                    {{ t('auth.email_reset_link') }}
                 </Button>
             </div>
         </Form>
 
         <div class="text-muted-foreground space-x-1 text-center text-sm">
-            <span>Or, return to</span>
-            <TextLink :href="login()">log in</TextLink>
+            <span>{{ t('auth.or_return_to') }}</span>
+            <TextLink :href="login()">{{ t('auth.log_in_inline') }}</TextLink>
         </div>
     </div>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '@/plugins/i18n';
 import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from '@lucide/vue';
 import { computed } from 'vue';
@@ -92,9 +93,9 @@ const rightNavItems: NavItem[] = [
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="left" class="w-[300px] p-6">
-                            <SheetTitle class="sr-only"
-                                >Navigation menu</SheetTitle
-                            >
+                            <SheetTitle class="sr-only">{{
+                                t('nav.menu')
+                            }}</SheetTitle>
                             <SheetHeader class="flex justify-start text-left">
                                 <AppLogoIcon
                                     class="size-6 fill-current text-black dark:text-white"

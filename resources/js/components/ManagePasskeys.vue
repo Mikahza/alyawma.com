@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '@/plugins/i18n';
 import { router } from '@inertiajs/vue3';
 import { KeyRound } from '@lucide/vue';
 import type { Passkey } from '@/types/auth';
@@ -33,8 +34,8 @@ const handleRegisterSuccess = () => {
     <div v-if="canManagePasskeys" class="space-y-6">
         <Heading
             variant="small"
-            title="Passkeys"
-            description="Manage your passkeys for passwordless sign-in"
+            :title="t('auth.passkeys')"
+            :description="t('auth.passkeys_subtitle')"
         />
 
         <div class="border-border overflow-hidden rounded-lg border">
@@ -53,9 +54,9 @@ const handleRegisterSuccess = () => {
                 >
                     <KeyRound class="text-muted-foreground h-7 w-7" />
                 </div>
-                <p class="font-medium">No passkeys yet</p>
+                <p class="font-medium">{{ t('auth.passkeys_empty') }}</p>
                 <p class="text-muted-foreground mt-1 text-sm">
-                    Add a passkey to sign in without a password
+                    {{ t('auth.passkeys_empty_hint') }}
                 </p>
             </div>
         </div>

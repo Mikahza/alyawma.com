@@ -14,6 +14,20 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Locales
+    |--------------------------------------------------------------------------
+    |
+    | The languages the interface is served in. The first is the default, and
+    | `app.locale` should agree with it. Adding one means adding a catalogue
+    | under `resources/js/locales/` and a directory under `lang/` — the parity
+    | test refuses a catalogue that drifts from the others.
+    |
+    */
+
+    'locales' => ['fr', 'en'],
+
     'administrator' => [
         'name' => env('ADMIN_NAME', 'Administrator'),
         'email' => env('ADMIN_EMAIL'),
