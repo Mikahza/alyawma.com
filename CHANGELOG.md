@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/Mikahza/alyawma.com/compare/v0.3.0...v0.4.0) (2026-09-17)
+
+
+### Features
+
+* serve the interface in French and English ([#16](https://github.com/Mikahza/alyawma.com/issues/16)) ([05c7967](https://github.com/Mikahza/alyawma.com/commit/05c7967abf11d244950ea7bd0392c557933739e1))
+
 ## [0.3.0](https://github.com/Mikahza/alyawma.com/compare/v0.2.0...v0.3.0) (2026-09-17)
 
 
