@@ -244,13 +244,14 @@ outside this document.
 | Password login | Yes | Only way in |
 | Password reset | Yes | Not excluded by the spec, and mandatory once third parties hold accounts: without it, a forgotten password means a lost account and a manual support request |
 | Email verification | No | Deliberate scope decision |
-| Two-factor (TOTP) | No | Deliberate |
-| Passkeys / WebAuthn | No | Deliberate |
-| Password confirmation | No | Deliberate |
+| Two-factor (TOTP) | No | Deliberate; the threat model of a food log does not justify TOTP, recovery codes and their interface |
+| Passkeys / WebAuthn | **Yes** | Reinstated on 16 September 2026. On a mobile-first app, signing in with a fingerprint beats typing a password on a phone keyboard, and it is phishing-resistant with no shared secret. Already built and tested by the starter kit |
+| Password confirmation | **Yes** | Not an independent choice: `Features::passkeys(['confirmPassword' => true])` requires it |
 | Teams | No | Strictly personal product |
 
-These exclusions are settled — do not propose re-enabling them. They are **not yet reflected in the
-code**: see contradiction C1 below.
+The exclusions above are settled — do not propose re-enabling them. Passkeys were the one exception:
+the maintainer reopened the question himself and chose to keep them. Accepted cost:
+`@laravel/passkeys` is pre-1.0, so a minor bump is breaking by convention.
 
 ### Roles
 
@@ -353,7 +354,7 @@ already-saved entries. That is the intended behaviour.
 
 Changing a target creates a new version effective from a date; it does not overwrite the previous
 one. Answering "was the target met on 12 March?" means resolving the goal version applicable on
-12 March. **Open — see Q6.**
+12 March. **Open — see Q3.**
 
 ### D3 — Macros are stored **per reference serving**, not per 100 g
 
@@ -374,7 +375,7 @@ entries produces totals that do not land clean, and it shows immediately on a ga
 
 A meal eaten at 23:30 Paris time belongs to that day, not the next. An entry therefore carries a
 **journal date** distinct from its technical timestamp. V1 uses a single application timezone,
-`Europe/Paris`. **Open — see Q7.**
+`Europe/Paris`. **Open — see Q4.**
 
 ### D6 — Deleting a food does not erase history
 
@@ -483,7 +484,7 @@ which is untracked — this repository is public and does not describe its infra
 Classic sources of "it worked locally":
 
 1. **Database.** `.env.example` declares SQLite; production will be MySQL 8.4. They differ on decimal
-   types, unique constraints and dates. **Open — see Q1.**
+   types, unique constraints and dates. Resolved: MySQL everywhere, local development included.
 2. **PHP.** Resolved: CI, `composer.json`, local machine and server all pinned to 8.4.
 3. **JS package manager.** Resolved: npm, single lockfile.
 
@@ -521,7 +522,7 @@ a PR screenshot.
 ### R3 — Registration is open from launch
 
 Third parties will create accounts and store personal data before legal notices and account deletion
-exist, if the legal lot lands late. **Open — see Q5.**
+exist, if the legal lot lands late. **Open — see Q2.**
 
 ### R4 — Email addresses are unverified
 
@@ -531,7 +532,7 @@ That case is handled manually.
 
 ### R5 — Without transactional email, password reset does not work
 
-`MAIL_MAILER=log` by default. A sending service is required, and it **blocks lot 2**. See Q4.
+`MAIL_MAILER=log` by default. A sending service is required, and it **blocks lot 2**. See Q1.
 
 ## 9. Open contradictions
 
@@ -548,7 +549,10 @@ traits on the model, five Vue pages, six components, the `@laravel/passkeys` npm
 `.well-known/passkey-endpoints` route, three rate limiters, and **five test files** that will fail
 the moment these features are switched off.
 
-This is a removal lot in its own right, not a config tweak. Scheduled as lot 2. **Open — see Q3.**
+**Resolved in lot 2, on 16 September 2026.** Email verification and two-factor authentication were
+removed in full — configuration, routes, middleware, model traits, `two_factor_*` columns, Vue pages
+and components, the `vue-input-otp` dependency and the corresponding tests. Passkeys, password reset
+and password confirmation were kept. 1341 lines removed, 18 added.
 
 ### C2 — "One lot per evening" and "6 to 9 lots" do not hold together
 
@@ -557,7 +561,7 @@ the validation unit, the PR the work unit; lots that overflow name their constit
 
 ### C3 — Open registration precedes the legal obligations
 
-See R3 and Q5.
+See R3 and Q2.
 
 ### C4 — The product was designed single-user
 
@@ -571,14 +575,20 @@ Questions awaiting the maintainer's call. Do not resolve them unilaterally.
 
 | # | Question | Blocks |
 |---|---|---|
-| Q1 | MySQL 8.4 locally too, or SQLite in dev with MySQL only in CI and production? | Lot 1 |
-| Q2 | Database backup needs a periodic job — Forge native Backups (needs an S3 bucket, so a cost) or a site-scoped Forge Scheduled Job (free, but shares the host disk)? | Lot 1 |
-| Q3 | How far does the Fortify removal go — drop the `passkeys` table and the 2FA columns, or only the screens? Password reset is kept either way (D9). | Lot 2 |
-| Q4 | Which transactional email service, and what budget? | Lot 2 |
-| Q5 | Keep registration closed until the legal lot ships, or move that lot earlier? | Lot 8 |
-| Q6 | Goals as a date-effective versioned table, or three targets frozen onto each day? | Lot 5 |
-| Q7 | `Europe/Paris` hardcoded, or a per-user timezone? | Lot 4 |
-| Q8 | Do shared foods published by a deleted administrator survive? | Lot 8 |
+| Q1 | Which transactional email service, and what budget? Password reset does not work until this is answered. | Lot 2 |
+| Q2 | Keep registration closed until the legal lot ships, or move that lot earlier? | Lot 8 |
+| Q3 | Goals as a date-effective versioned table, or three targets frozen onto each day? | Lot 5 |
+| Q4 | `Europe/Paris` hardcoded, or a per-user timezone? | Lot 4 |
+| Q5 | Do shared foods published by a deleted administrator survive? | Lot 8 |
+
+### Settled
+
+- **The database runs on MySQL everywhere**, local development included, matching the sibling
+  project. Tests stay on SQLite in memory — so a decimal-precision bug would surface in local use,
+  not in the suite.
+- **The database backup is deferred** by the maintainer. To be revisited before registration opens
+  to anyone else; a production database with no backup is an incident waiting to happen.
+- **Passkeys are kept**, two-factor authentication and email verification are not. See C1.
 
 ## 11. Out of scope for V1
 
